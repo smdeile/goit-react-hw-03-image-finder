@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import styles from '../styles.module.css';
+import PropTypes from 'prop-types';
 
 export default class Searchbar extends Component {
   state = { query: '' };
-
+  static propTypes = { onSubmit: PropTypes.func };
   handleChange = ({ target }) => {
     const { name, value } = target;
     this.setState({ [name]: value });
@@ -20,9 +21,11 @@ export default class Searchbar extends Component {
       <div className={styles.buttonBorder}>
         <form onSubmit={this.handleSubmit} className={styles.form}>
           <button type="submit" className={styles.button}>
-            <span role="img" aria-label="search">
-              &#128269;
-            </span>
+            <span
+              className={styles.buttonLabel}
+              role="img"
+              aria-label="search"
+            ></span>
           </button>
           <input
             onChange={this.handleChange}

@@ -1,31 +1,21 @@
 import React from 'react';
-import Modal from './Modal';
+import PropTypes from 'prop-types';
 
 import styles from '../styles.module.css';
 
-const ImageGalleryItem = ({
-  webformatURL,
-  tags,
-  onClick,
-  largeImageURL,
-  state,
-  onSelect,
-}) => (
-  <li className="ImageGalleryItem">
+const ImageGalleryItem = ({ webformatURL, alt, onSelect }) => (
+  <li className={styles.ImageGalleryItem}>
     <img
       src={webformatURL}
-      alt={tags}
+      alt={alt}
       className={styles.image}
-      onClick={onClick}
+      onClick={onSelect}
     />
-    {/* {state.isModalOpen && (
-      <Modal
-        onClick={onClick}
-        largeImageURL={largeImageURL}
-        state={state}
-        onSelect={onSelect}
-      />
-    )} */}
   </li>
 );
+ImageGalleryItem.propTypes = {
+  webformatURL: PropTypes.string,
+  alt: PropTypes.string,
+  onSelect: PropTypes.func,
+};
 export default ImageGalleryItem;

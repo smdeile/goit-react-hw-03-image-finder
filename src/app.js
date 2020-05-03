@@ -5,27 +5,31 @@ import articlesApi from './services/articlesApi';
 import ImageGallery from './components/ImageGallery';
 import Button from './components/Button';
 import Modal from './components/Modal';
+import styles from './styles.module.css';
+
 import Loader from 'react-loader-spinner';
 
 export default class App extends Component {
   state = {
     articles: [],
     error: null,
-    loading: 'false',
     page: 1,
     isLoading: false,
     query: '',
+    isModalOpen: false,
+    modalItem: [],
   };
 
   componentDidMount() {
     this.fetchArticles();
   }
-  fetchArticles = query => {
+
+  fetchArticles = (query, page) => {
     if (query !== undefined) {
       this.setState({ isLoading: true });
 
       articlesApi
-        .FetchArticles(query)
+        .FetchArticles(query, page)
         .then(articles =>
           this.setState(prevState => ({
             articles: [...prevState.articles, ...articles],
@@ -39,28 +43,17 @@ export default class App extends Component {
         });
     }
   };
-  handleClick = async () => {
-    // e.preventDefault();
-    const { query, page } = this.state;
-
-    await articlesApi
-      .FetchArticles(query, page)
-      .then(articles =>
-        this.setState(prevState => ({
-          articles: [...prevState.articles, ...articles],
-          page: prevState.page + 1,
-        })),
-      )
-      .catch(error => this.setState({ error }))
-      .finally(() => {
-        this.setState({ isLoading: false });
-      });
-    // window.scrollTo({
-    //   top: document.documentElement.scrollHeight,
-    //   behavior: 'smooth',
-    // });
+  toggleModal = () => this.setState({ isModalOpen: !this.state.isModalOpen });
+  onSelect = async id => {
+    await this.setState(state => ({
+      modalItem: state.articles.filter(image => image.id === id),
+      isModalOpen: !this.state.isModalOpen,
+    }));
   };
-  listRef = createRef();
+  handleClick = async () => {
+    const { query, page } = this.state;
+    this.fetchArticles(query, page);
+  };
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.articles !== this.state.articles) {
@@ -72,21 +65,26 @@ export default class App extends Component {
   }
   render() {
     return (
-      <div ref={this.listRef}>
-        {this.state.isLoading && (
-          <Loader type="ThreeDots" color="#00BFFF" height={80} width={80} />
-        )}
+      <div className={styles.app}>
         <Searchbar onSubmit={this.fetchArticles} />
-        <ImageGallery articleList={this.state.articles} />
-        {this.state.articles.length > 0 && (
-          <Button tittle="Load more" onClick={this.handleClick} />
-        )}
+        <div className={styles.loadMoreBlock}>
+          {this.state.isLoading && (
+            <Loader type="ThreeDots" color="#00BFFF" height={80} width={80} />
+          )}
+        </div>
+        <ImageGallery
+          articleList={this.state.articles}
+          onSelect={this.onSelect}
+        />
+        <div className={styles.loadMoreBlock}>
+          {this.state.articles.length > 0 && (
+            <Button tittle="Load more" onClick={this.handleClick} />
+          )}
+        </div>
         {this.state.isModalOpen && (
           <Modal
-            onClick={onClick}
-            largeImageURL={largeImageURL}
-            state={state}
-            onSelect={onSelect}
+            item={this.state.modalItem[0]}
+            toggleModal={this.toggleModal}
           />
         )}
       </div>

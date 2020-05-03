@@ -1,8 +1,12 @@
 import React, { Component, createRef } from 'react';
 import styles from '../styles.module.css';
+import PropTypes from 'prop-types';
 
 export default class Modal extends Component {
   backDropRef = createRef();
+  static propTypes = {
+    item: PropTypes.objectOf(PropTypes.string),
+  };
 
   componentDidMount() {
     window.addEventListener('keydown', this.handlePress);
@@ -12,16 +16,17 @@ export default class Modal extends Component {
   }
   handlePress = e => {
     if (e.code !== 'Escape') return;
-    this.props.onClick();
+    this.props.toggleModal();
   };
+
   handleBackDropClick = e => {
     const { current } = this.backDropRef;
-    console.log(current);
     if (current && current !== e.target) return;
-    this.props.onClick();
+    this.props.toggleModal();
   };
+
   render() {
-    const { largeImageURL } = this.props;
+    const { item } = this.props;
     return (
       <div
         ref={this.backDropRef}
@@ -29,7 +34,7 @@ export default class Modal extends Component {
         onClick={this.handleBackDropClick}
       >
         <div className={styles.modal}>
-          <img src={largeImageURL} alt="" />
+          <img src={item.largeImageURL} alt={item.tags} />
         </div>
       </div>
     );
